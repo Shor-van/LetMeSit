@@ -33,8 +33,7 @@ public class LetMeSit extends JavaPlugin
 	    {
 	        if(((Stairs)data).getHalf() == Half.TOP) //Is stair block upside down
 	            return false;
-	        else
-	            return true;
+	        return true;
 	    }
 	    return false;
 	}

@@ -3,6 +3,7 @@ package github.shor_van.letmesit;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
+import org.bukkit.block.data.Bisected.Half;
 import org.bukkit.block.data.BlockData;
 import org.bukkit.block.data.type.Stairs;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -30,7 +31,7 @@ public class LetMeSit extends JavaPlugin
 	    BlockData data = block.getState().getBlockData();
 	    if(data instanceof Stairs)
 	    {
-	        if(((Stairs)data).getFacing() == BlockFace.DOWN) //Is stair block upside down
+	        if(((Stairs)data).getHalf() == Half.TOP) //Is stair block upside down
 	            return false;
 	            
             Material material = block.getType();

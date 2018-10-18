@@ -1,0 +1,5 @@
+name: LetMeSit
+main: github.shor_van.leftmesit.LetMeSit
+version: 0.0.0a b0 (1.13.1)
+api-version: 1.13
+commands:

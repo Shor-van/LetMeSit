@@ -1,7 +1,10 @@
 package github.shor_van.letmesit;
 
+import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
+import org.bukkit.entity.Entity;
+import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -31,10 +34,16 @@ public class EventListener implements Listener
             Player player = event.getPlayer();
             Block block = event.getClickedBlock();
             
+            //if player is sitting ignore
+            
             //Is block a valid chair block and item in hands are not blocks
             if(LetMeSit.isBlockValidChair(block) && event.isBlockInHand() == false && (player.getInventory().getItemInOffHand().getType() == Material.AIR || player.getInventory().getItemInOffHand().getType().isBlock() == false))
             {
-                player.sendMessage("Interact");
+                Entity entity = player.getWorld().spawnEntity(new Location(player.getWorld(), block.getX() + 0.5, block.getY() - 0.1, block.getZ() + 0.5, 0.0f, 0.0f), EntityType.ARROW);
+                entity.setInvulnerable(true);
+                entity.setSilent(true);
+                entity.addPassenger(player);
+                player.sendMessage("You are now sitting.");
             }
         }
     }

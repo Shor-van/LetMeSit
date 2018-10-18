@@ -1,8 +1,6 @@
 package github.shor_van.letmesit;
 
-import org.bukkit.Material;
 import org.bukkit.block.Block;
-import org.bukkit.block.BlockFace;
 import org.bukkit.block.data.Bisected.Half;
 import org.bukkit.block.data.BlockData;
 import org.bukkit.block.data.type.Stairs;

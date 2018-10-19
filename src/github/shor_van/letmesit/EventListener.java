@@ -4,6 +4,9 @@ import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
+import org.bukkit.block.BlockFace;
+import org.bukkit.block.data.BlockData;
+import org.bukkit.block.data.type.Stairs;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.LivingEntity;
@@ -13,6 +16,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
+import org.bukkit.event.entity.CreatureSpawnEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
@@ -22,6 +26,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 public class EventListener implements Listener
 {
+    private static boolean forceSpawn = false; //Set to true when spawning entity to bypass world guard
     private final JavaPlugin plugin; //Reference to the base plugin, should not be null
     
     public EventListener(JavaPlugin plugin)
@@ -41,19 +46,48 @@ public class EventListener implements Listener
             Block block = event.getClickedBlock();
             
             //if player is sitting ignore
-            
+            if(player.isInsideVehicle() == true)
+                return;
+                
             //Is block a valid chair block and item in hands are not blocks
             if(LetMeSit.isBlockValidChair(block) && event.isBlockInHand() == false && (player.getInventory().getItemInOffHand().getType() == Material.AIR || player.getInventory().getItemInOffHand().getType().isBlock() == false))
             {
-                //hold player's location
+                //hold player's location for when they dismount
+                
+                //set up entity's location
+                double x = block.getX() + 0.5;
+                double y = block.getY() - 0.3;
+                double z = block.getZ() + 0.5;
+                float yaw = 0.0f;
+                BlockData data = block.getState().getBlockData();
+                if(data instanceof Stairs)
+                {
+                    Stairs stairData = (Stairs) data;
+                    if(stairData.getFacing() == BlockFace.NORTH)
+                        yaw = 0.0f;
+                    else if(stairData.getFacing() == BlockFace.SOUTH)
+                        yaw = 180.0f;
+                    else if(stairData.getFacing() == BlockFace.EAST)
+                        yaw = 90.0f;
+                    else if(stairData.getFacing() == BlockFace.WEST)
+                        yaw = 270.0f;
+                }
+                
+                Location location = new Location(player.getWorld(), x, y, z, yaw, 0.0f);
                 
                 //Spawn entity and set player as passenger
-                Entity entity = player.getWorld().spawnEntity(new Location(player.getWorld(), block.getX() + 0.5, block.getY() - 0.3, block.getZ() + 0.5, 0.0f, 0.0f), EntityType.PIG);
+                forceSpawn = true;
+                Entity entity = player.getWorld().spawnEntity(location, EntityType.PIG);
+                forceSpawn = false;
+                
+                //Setup entity
                 entity.setCustomName(ChatColor.translateAlternateColorCodes('&', "&6ChairPig"));
                 entity.setCustomNameVisible(false);
                 entity.setInvulnerable(true);
                 entity.setSilent(true);
                 ((LivingEntity) entity).setAI(false);
+                
+                //set player as passenger
                 entity.addPassenger(player);
                 
                 player.sendMessage("You are now sitting.");
@@ -87,5 +121,13 @@ public class EventListener implements Listener
     public void onPlayerDisconnect(PlayerQuitEvent event)
     {
         
+    }
+    
+    //world guard override
+    @EventHandler(priority=EventPriority.HIGHEST)
+    public void onCreatureSpawn(CreatureSpawnEvent e)
+    {
+        if (forceSpawn)
+            e.setCancelled(false);
     }
 }

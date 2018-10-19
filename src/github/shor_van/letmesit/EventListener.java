@@ -23,6 +23,9 @@ import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.event.vehicle.VehicleExitEvent;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.bukkit.potion.Potion;
+import org.bukkit.potion.PotionEffect;
+import org.bukkit.potion.PotionEffectType;
 
 public class EventListener implements Listener
 {
@@ -86,6 +89,7 @@ public class EventListener implements Listener
                 entity.setInvulnerable(true);
                 entity.setSilent(true);
                 ((LivingEntity) entity).setAI(false);
+                ((LivingEntity) entity).addPotionEffect(new PotionEffect(PotionEffectType.INVISIBILITY, Integer.MAX_VALUE, 0, false, false), true);
                 
                 //set player as passenger
                 entity.addPassenger(player);

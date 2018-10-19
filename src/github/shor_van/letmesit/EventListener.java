@@ -62,10 +62,44 @@ public class EventListener implements Listener
                     return;
                 }
                 
-                //Create sitting player
-                forceSpawn = true;
+                //set up entity's location
+                double x = block.getX() + 0.5;
+                double y = block.getY() - 0.3;
+                double z = block.getZ() + 0.5;
+                float yaw = 0.0f;
+                BlockData data = block.getState().getBlockData();
+                if(data instanceof Stairs)
+                {
+                    Stairs stairData = (Stairs) data;
+                    if(stairData.getFacing() == BlockFace.NORTH)
+                        yaw = 0.0f;
+                    else if(stairData.getFacing() == BlockFace.SOUTH)
+                        yaw = 180.0f;
+                    else if(stairData.getFacing() == BlockFace.EAST)
+                        yaw = 90.0f;
+                    else if(stairData.getFacing() == BlockFace.WEST)
+                        yaw = 270.0f;
+                }
+                
+                Location location = new Location(player.getWorld(), x, y, z, yaw, 0.0f);
+                
+                //Spawn entity and set player as passenger
+                Entity entity = player.getWorld().spawnEntity(location, EntityType.PIG);
+                
+                //Setup entity
+                entity.setCustomName(ChatColor.translateAlternateColorCodes('&', "&6ChairPig"));
+                entity.setCustomNameVisible(false);
+                entity.setInvulnerable(true);
+                entity.setSilent(true);
+                ((LivingEntity) entity).setAI(false);
+                //((LivingEntity) entity).addPotionEffect(new PotionEffect(PotionEffectType.INVISIBILITY, Integer.MAX_VALUE, 0, false, false), true);
+                
+                //Add to the list
                 ((LetMeSit) plugin).getSittingPlayers().add(new SittingPlayer(player, block));
-                forceSpawn = false;
+                
+                //set player as passenger
+                entity.addPassenger(player);
+                player.getLocation().setYaw(yaw);
                 
                 player.sendMessage("You are now sitting.");
             }
@@ -78,10 +112,16 @@ public class EventListener implements Listener
         LivingEntity entity = event.getExited();
         if(entity instanceof Player)//is the entity that left a player
         {
-            if(event.getVehicle().getCustomName().equals(ChatColor.translateAlternateColorCodes('&', "&6ChairPig")))//Is it a "chair pig" vehicle entity
+            Vehicle vehicleEntity = event.getVehicle();
+            if(vehicleEntity.getCustomName().equals(ChatColor.translateAlternateColorCodes('&', "&6ChairPig")))//Is it a "chair pig" vehicle entity
             {
                 Player player = (Player) entity;
-                ((LetMeSit) plugin).removeSittingPlayer(player);
+                SittingPlayer sittingPlayer = ((LetMeSit) plugin).getSittingPlayer(player); 
+                
+                vehicleEntity.remove();
+                player.teleport(sittingPlayer.getOriginalLocation());
+                ((LetMeSit) plugin).removeSittingPlayer(sittingPlayer);
+                
                 player.sendMessage("You are nolonger sitting.");
             }
         }
@@ -91,20 +131,32 @@ public class EventListener implements Listener
     public void onPlayerDeath(PlayerDeathEvent event)
     {
         Player player = event.getEntity();
-        
         if(player.isInsideVehicle() == true)//Check if player is in a vehicle
-            if(player.getVehicle().getCustomName().equals(ChatColor.translateAlternateColorCodes('&', "&6ChairPig")))//Is it a "chair pig" vehicle entity
-                ((LetMeSit) plugin).removeSittingPlayer(player);
+        {
+            Entity vehicleEntity = player.getVehicle();
+            if(vehicleEntity.getCustomName().equals(ChatColor.translateAlternateColorCodes('&', "&6ChairPig")))//Is it a "chair pig" vehicle entity
+            {
+                vehicleEntity.remove();
+                SittingPlayer sittingPlayer = ((LetMeSit) plugin).getSittingPlayer(player); 
+                ((LetMeSit) plugin).removeSittingPlayer(sittingPlayer);
+            }
+        }
     }
     
     @EventHandler(priority=EventPriority.HIGH)
     public void onPlayerDisconnect(PlayerQuitEvent event)
     {
         Player player = event.getPlayer();
-        
         if(player.isInsideVehicle() == true)//Check if player is in a vehicle
-            if(player.getVehicle().getCustomName().equals(ChatColor.translateAlternateColorCodes('&', "&6ChairPig")))//Is it a "chair pig" vehicle entity
-                ((LetMeSit) plugin).removeSittingPlayer(player);
+        {   
+            Entity vehicleEntity = player.getVehicle();
+            if(vehicleEntity.getCustomName().equals(ChatColor.translateAlternateColorCodes('&', "&6ChairPig")))//Is it a "chair pig" vehicle entity
+            {
+                vehicleEntity.remove();
+                SittingPlayer sittingPlayer = ((LetMeSit) plugin).getSittingPlayer(player); 
+                ((LetMeSit) plugin).removeSittingPlayer(sittingPlayer);
+            }
+        }
     }
     
     @EventHandler(priority=EventPriority.LOWEST)
@@ -113,7 +165,6 @@ public class EventListener implements Listener
         //If event cancelled ignore
         if(event.isCancelled() == true)
             return;
-        
         
     }
     

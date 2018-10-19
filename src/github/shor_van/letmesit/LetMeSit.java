@@ -36,14 +36,6 @@ public class LetMeSit extends JavaPlugin
 		eventListener = null;
 	}
 	
-	public boolean isPlayerSitting(Player player)
-	{
-	    for(SittingPlayer sittingPlayer : sittingPlayers)
-	        if(sittingPlayer.isThisPlayer(player))
-	            return true;
-	    return false;
-	}
-	
 	public boolean isBlockOccupied(Block block)
 	{
 	    for(SittingPlayer sittingPlayer : sittingPlayers)
@@ -68,6 +60,12 @@ public class LetMeSit extends JavaPlugin
 	        sittingPlayer.remove();
 	        sittingPlayers.remove(sittingPlayer);
 	    }
+	}
+	
+	public void removeSittingPlayer(SittingPlayer sittingPlayer)
+	{
+        sittingPlayer.remove();
+        sittingPlayers.remove(sittingPlayer);
 	}
 	
     public List<SittingPlayer> getSittingPlayers() { return sittingPlayers; }

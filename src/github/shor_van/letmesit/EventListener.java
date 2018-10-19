@@ -1,5 +1,6 @@
 package github.shor_van.letmesit;
 
+import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
@@ -7,6 +8,7 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
+import org.bukkit.entity.Vehicle;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
@@ -46,7 +48,9 @@ public class EventListener implements Listener
                 //hold player's location
                 
                 //Spawn entity and set player as passenger
-                Entity entity = player.getWorld().spawnEntity(new Location(player.getWorld(), block.getX() + 0.5, block.getY() - 0.1, block.getZ() + 0.5, 0.0f, 0.0f), EntityType.PIG);
+                Entity entity = player.getWorld().spawnEntity(new Location(player.getWorld(), block.getX() + 0.5, block.getY() - 0.3, block.getZ() + 0.5, 0.0f, 0.0f), EntityType.PIG);
+                entity.setCustomName(ChatColor.translateAlternateColorCodes('&', "&6ChairPig"));
+                entity.setCustomNameVisible(false);
                 entity.setInvulnerable(true);
                 entity.setSilent(true);
                 ((LivingEntity) entity).setAI(false);
@@ -61,10 +65,15 @@ public class EventListener implements Listener
     public void onPlayerDismount(VehicleExitEvent event)
     {
         LivingEntity entity = event.getExited();
-        if(entity instanceof Player)
+        if(entity instanceof Player)//is the entity that left a player
         {
-            Player player = (Player) entity;
-            player.sendMessage("You are nolonger sitting.");
+            Vehicle vehicleEntity = event.getVehicle();
+            if(vehicleEntity.getCustomName().equals(ChatColor.translateAlternateColorCodes('&', "&6ChairPig")))//Is it a "chair pig" vehicle entity
+            {
+                vehicleEntity.remove();
+                Player player = (Player) entity;
+                player.sendMessage("You are nolonger sitting.");
+            }
         }
     }
     

@@ -63,8 +63,10 @@ public class EventListener implements Listener
                 }
                 
                 //Create sitting player
+                forceSpawn = true;
                 ((LetMeSit) plugin).getSittingPlayers().add(new SittingPlayer(player, block));
-               
+                forceSpawn = false;
+                
                 player.sendMessage("You are now sitting.");
             }
         }

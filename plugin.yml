@@ -1,5 +1,5 @@
 name: LetMeSit
-main: github.shor_van.letmesit.LetMeSit
-version: 0.2.0a b27 (1.13.1)
+main: github.shor_van.chairs.Chairs
+version: 0.2.0a b22 (1.13.1)
 api-version: 1.13
 commands:

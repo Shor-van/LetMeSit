@@ -1,4 +1,4 @@
-package github.shor_van.letmesit;
+package github.shor_van.chairs;
 
 import org.bukkit.Location;
 import org.bukkit.block.Block;

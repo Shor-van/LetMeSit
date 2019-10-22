@@ -6,6 +6,6 @@
 		</attributes>
 	</classpathentry>
 	<classpathentry kind="src" path="src"/>
-	<classpathentry kind="lib" path="C:/Users/Shor_van/Documents/Eclipse Workspace/External Libs/craftbukkit.jar"/>
+	<classpathentry kind="lib" path="C:/Users/Shor_van/Documents/Eclipse Workspace/External Libs/craftbukkit-1.13.2.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
